@@ -4,10 +4,8 @@ import org.pentaho.reporting.engine.classic.core.AttributeNames;
 import org.pentaho.reporting.engine.classic.core.Element;
 import org.pentaho.reporting.engine.classic.core.modules.parser.base.ReportParserUtil;
 import org.pentaho.reporting.engine.classic.core.style.*;
-import org.pentaho.reporting.engine.classic.core.wizard.EmptyDataAttributes;
 import org.pentaho.reporting.libraries.base.util.StringUtils;
 import org.pentaho.reporting.libraries.xmlns.parser.ParseException;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.MutableAttributeSet;
@@ -203,14 +201,19 @@ public class HtmlStylesRichTechConverter {
     }
 
 
-    public void configureStyle( final javax.swing.text.Element textElement, final Element result ) {
+    /**
+     * Main method for styles computation. Gets styles from textElement AND element's document's stylesheet's styles and converts them into result's style.
+     * @param textElement
+     * @param result
+     */
+    public void configureStyle( final javax.swing.text.Element textElement, final Element result , final Element parentOfResult) {
         final HTMLDocument htmlDocument = (HTMLDocument) textElement.getDocument();
         final StyleSheet sheet = htmlDocument.getStyleSheet();
         AttributeSet attr = computeStyle( textElement, sheet );
 
 
         processDocumentSheetStyles(sheet, result, attr);
-        //attr = processElementsParentStyles(textElement, result, sheet, attr);
+        attr = processElementsParentStyles(textElement, result, parentOfResult, sheet, attr);
         processElementOwnStyles(result, sheet, attr);
 
     }
@@ -227,20 +230,40 @@ public class HtmlStylesRichTechConverter {
         }
     }
 
-    private AttributeSet processElementsParentStyles(javax.swing.text.Element textElement, Element result, StyleSheet sheet, AttributeSet attr) {
+    private AttributeSet processElementsParentStyles(final javax.swing.text.Element textElement, final Element result, final Element parentOfResult, final StyleSheet sheet, final AttributeSet attr) {
+        /*
         javax.swing.text.Element element = textElement;
         do {
             element = element.getParentElement();
         } while ((element != null && element.getParentElement() != element)
                 && (HtmlRichTextConverter.is(element, HTML.Tag.IMPLIED) || HtmlRichTextConverter.is(element, "content")));
-
-        if (element != null) {
-            return copyTextStyles(element, textElement, result, sheet);
+*/
+        if (parentOfResult != null) {
+            copyTextStyles(parentOfResult, result);
+        }
+        return attr;
+   /*
         } else {
             return attr;
         }
+        */
+        //TODO here ...
+
     }
 
+
+    private void copyTextStyles(final Element parent, final Element result) {
+
+        copyIfSo(parent, result, ElementStyleKeys.PAINT);
+        copyIfSo(parent, result, ElementStyleKeys.FILL_COLOR);
+
+        for (StyleKey style: TextStyleKeys.ALL) {
+            copyIfSo(parent, result, style);
+        }
+
+    }
+
+/*
     private AttributeSet copyTextStyles(javax.swing.text.Element parent, javax.swing.text.Element textElement, Element result, StyleSheet sheet) {
         final AttributeSet attr = computeStyle( parent, sheet );
 
@@ -253,19 +276,6 @@ public class HtmlStylesRichTechConverter {
             set.addAttribute(name, parent.getAttributes().getAttribute(name));
         }
 
-        copyIfSo(parent, set, CSS.Attribute.COLOR);
-        copyIfSo(parent, set, CSS.Attribute.FONT);
-        copyIfSo(parent, set, CSS.Attribute.FONT_FAMILY);
-        copyIfSo(parent, set, CSS.Attribute.FONT_SIZE);
-        copyIfSo(parent, set, CSS.Attribute.FONT_STYLE);
-        copyIfSo(parent, set, CSS.Attribute.FONT_VARIANT);
-        copyIfSo(parent, set, CSS.Attribute.FONT_WEIGHT);
-        copyIfSo(parent, set, CSS.Attribute.LETTER_SPACING);
-        copyIfSo(parent, set, CSS.Attribute.LINE_HEIGHT);
-        copyIfSo(parent, set, CSS.Attribute.TEXT_DECORATION);
-        copyIfSo(parent, set, CSS.Attribute.VERTICAL_ALIGN);
-        copyIfSo(parent, set, CSS.Attribute.WHITE_SPACE);
-        copyIfSo(parent, set, CSS.Attribute.WORD_SPACING);
 //        copyIfSo(parent, set, CSS.Attribute.FONT);
 //        copyIfSo(parent, set, CSS.Attribute.FONT);
 //
@@ -294,11 +304,13 @@ public class HtmlStylesRichTechConverter {
 
         return set;
     }
+*/
 
-    private void copyIfSo(javax.swing.text.Element from, SimpleAttributeSet toSet, javax.swing.text.html.CSS.Attribute attribute) {
-        Object value = from.getAttributes().getAttribute(attribute);
-        if (value != null && toSet.getAttribute(attribute) == null) { // TODO fixme disables overriding, yes?
-            toSet.addAttribute(attribute, value);
+    private void copyIfSo(Element from, Element to, StyleKey attribute) {
+        Object value = from.getStyle().getStyleProperty(attribute);
+        if (value != null/* && to.getStyle().getStyleProperty(attribute) == null*/) {
+            // TODO fixme disables overriding, yes?
+            to.getStyle().setStyleProperty(attribute, value);
         }
     }
 
@@ -834,3 +846,4 @@ public class HtmlStylesRichTechConverter {
     }
 
 }
+

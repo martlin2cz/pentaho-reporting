@@ -17,6 +17,10 @@
 
 package org.pentaho.reporting.engine.classic.core.style;
 
+import org.pentaho.reporting.engine.classic.core.MetaAttributeNames;
+
+import javax.xml.soap.Text;
+
 public class TextStyleKeys {
   private TextStyleKeys() {
   }
@@ -126,4 +130,14 @@ public class TextStyleKeys {
   public static final StyleKey DIRECTION = StyleKey.getStyleKey( "direction", TextDirection.class );
 
   public static final StyleKey TEXT_ROTATION = StyleKey.getStyleKey( "rotation", TextRotation.class );
+
+
+  public static final StyleKey ALL[] = new StyleKey[] {TextStyleKeys.WHITE_SPACE_COLLAPSE,
+          TextStyleKeys.FONTSIZE, TextStyleKeys.FONT, TextStyleKeys.FONTSIZE,
+          TextStyleKeys.BOLD, TextStyleKeys.ITALIC, TextStyleKeys.UNDERLINED, TextStyleKeys.STRIKETHROUGH,
+          TextStyleKeys.TEXT_ROTATION, TextStyleKeys.TEXT_WRAP,
+          TextStyleKeys.EMBEDDED_FONT, TextStyleKeys.TRIM_TEXT_CONTENT, TextStyleKeys.WORDBREAK, TextStyleKeys.FONTENCODING,
+          TextStyleKeys.LINEHEIGHT, TextStyleKeys.RESERVED_LITERAL, TextStyleKeys.DIRECTION, TextStyleKeys.FONT_SMOOTH,
+          TextStyleKeys.VERTICAL_TEXT_ALIGNMENT, TextStyleKeys.X_MIN_LETTER_SPACING, TextStyleKeys.FIRST_LINE_INDENT, TextStyleKeys.TEXT_INDENT,
+          TextStyleKeys.WORD_SPACING, TextStyleKeys.X_MAX_LETTER_SPACING, X_OPTIMUM_LETTER_SPACING};
 }
